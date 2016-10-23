@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>trello</title>
+    <style media="screen">
+      body {
+        background-color: rgba(0, 255, 0, 0.5);
+      }
+      .container {
+        position: relative;
+        border: 10px solid #000;
+        width: 200px;
+        margin-left: 90px;
+        float: left;
+      }
+      .wrap {
+        position: relative;
+        height: 200px;
+        width: 200px;
+        margin: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      .drag {
+        position: relative;
+        height: 180px;
+        width: 180px;
+        margin: 10px;
+        background-color: red;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+        -webkit-user-select:none;
+        z-index: 998;
+      }
+
+      .mask::after {
+        content: "";
+        position: absolute;
+        top:0;
+        left:0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- <div class="wrap"> -->
+         <div class="drag drag1">2</div>
+      <!-- </div> -->
+      <!-- <div class="wrap"> -->
+        <div class="drag drag1" style="background-color:yellow">3</div>
+      <!-- </div> -->
+      <!-- <div class="wrap"> -->
+        <div class="drag drag1" style="background-color:green">4</div>
+      <!-- </div> -->
+    </div>
+    <div class="container">
+      <!-- <div class="wrap"> -->
+         <div class="drag drag2">2</div>
+      <!-- </div> -->
+      <!-- <div class="wrap"> -->
+        <div class="drag drag2" style="background-color:yellow">3</div>
+      <!-- </div> -->
+      <!-- <div class="wrap"> -->
+        <div class="drag drag2" style="background-color:green">4</div>
+      <!-- </div> -->
+    </div>
+    <script type="text/javascript" src="./index.js">
+
+    </script>
+    <script type="text/javascript">
+    var container = $('.container')[0]
+    var isDrag = false
+    var target = null
+    var sourceTarget = null
+    var holderElm = null
+    var pointer = {
+      startX: 0,
+      startY: 0,
+      dX: 0,
+      dY: 0,
+      moveX: 0,
+      moveY: 0
+    }
+
+    on(document, 'mousemove', (e) => {
+      if(target !== null){
+        pointer.moveX = e.clientX
+        pointer.moveY = e.clientY
+        move(target, pointer, true)
+      }
+    })
+
+    on(document, 'mouseup', () => {
+      isDrag = false
+      if(target) {
+        document.body.removeChild(target)
+        removeClass(sourceTarget, 'mask')
+        target = null
+      }
+    })
+
+    on($('.drag'), 'mousedown', function(e) {
+      pointer.startX = e.clientX
+      pointer.startY = e.clientY
+      pointer.dX = e.clientX
+      pointer.dY = e.clientY
+      setTimeout(() => {
+        isDrag = true
+        sourceTarget = e.target
+        target = copyElm(sourceTarget)
+        addClass(sourceTarget, 'mask')
+        document.body.appendChild(target)
+      })
+    })
+
+    var det1 = detect($('.drag'))
+    // var det2 = detect($('.drag2'))
+    function move(elm, point, isdrag) {
+      if(isdrag) {
+        elm.style.transform = `translate3d(${pointer.moveX - pointer.startX}px, ${pointer.moveY - pointer.startY}px, 0) rotate(5deg)`
+      } else {
+        elm.style.transform = `translate3d(${pointer.moveX - pointer.startX}px, ${pointer.moveY - pointer.startY}px, 0)`
+      }
+      det1(elm, sourceTarget, point)
+      // det2(elm,sourceTarget, point)
+    }
+    </script>
+  </body>
+</html>
