@@ -5,26 +5,22 @@
     <title>trello</title>
     <style media="screen">
       body {
-        background-color: rgba(0, 255, 0, 0.5);
+        /*background-color: rgba(0, 255, 0, 0.5);*/
+        background-color: #eee;
       }
+
       .container {
         position: relative;
-        border: 10px solid #000;
+        /*border: 10px solid #000;*/
         width: 200px;
         margin-left: 90px;
         float: left;
         transition: all .5s;
       }
-      .wrap {
-        position: relative;
-        height: 200px;
-        width: 200px;
-        margin: 10px;
-        background-color: rgba(0, 0, 0, 0.5);
-      }
+
       .drag {
         position: relative;
-        height: 180px;
+        height: 80px;
         width: 180px;
         margin: 10px;
         background-color: red;
@@ -44,38 +40,31 @@
         left:0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(222, 222, 222, 1);
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <!-- <div class="wrap"> -->
-         <div class="drag drag1">2</div>
-      <!-- </div> -->
-      <!-- <div class="wrap"> -->
-        <div class="drag drag1" style="background-color:yellow">3</div>
-      <!-- </div> -->
-      <!-- <div class="wrap"> -->
-        <div class="drag drag1" style="background-color:green">4</div>
-      <!-- </div> -->
     </div>
     <div class="container">
-      <!-- <div class="wrap"> -->
-         <div class="drag drag2">2</div>
-      <!-- </div> -->
-      <!-- <div class="wrap"> -->
-        <div class="drag drag2" style="background-color:yellow">3</div>
-      <!-- </div> -->
-      <!-- <div class="wrap"> -->
-        <div class="drag drag2" style="background-color:green">4</div>
-      <!-- </div> -->
+      <div class="drag drag2">2</div>
+      <div class="drag drag2" style="background-color:yellow">3</div>
+      <div class="drag drag2" style="background-color:green">4</div>
     </div>
     <script type="text/javascript" src="./index.js">
-
     </script>
     <script type="text/javascript">
     var container = $('.container')[0]
+    var inhtm = '', inhtm2 = ''
+    for (var i = 0; i < 10; i++) {
+      inhtm += `<div class="drag" style="background-color:${randomColor()}"></div>`
+    }
+    $('.container')[0].innerHTML = inhtm
+    for (var i = 0; i < 10; i++) {
+      inhtm2 += `<div class="drag" style="background-color:${randomColor()}"></div>`
+    }
+    $('.container')[1].innerHTML = inhtm2
     var isDrag = false
     var target = null
     var sourceTarget = null
@@ -121,7 +110,6 @@
     })
 
     var det1 = detect($('.drag'))
-    // var det2 = detect($('.drag2'))
     function move(elm, point, isdrag) {
       if(isdrag) {
         elm.style.transform = `translate3d(${pointer.moveX - pointer.startX}px, ${pointer.moveY - pointer.startY}px, 0) rotate(5deg)`
@@ -129,7 +117,10 @@
         elm.style.transform = `translate3d(${pointer.moveX - pointer.startX}px, ${pointer.moveY - pointer.startY}px, 0)`
       }
       det1(elm, sourceTarget, point)
-      // det2(elm,sourceTarget, point)
+    }
+
+    function randomColor () {
+      return `rgba(${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, 1)`
     }
     </script>
   </body>

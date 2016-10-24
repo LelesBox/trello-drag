@@ -65,7 +65,6 @@ function detect (elms) {
       var minarea = Math.min(p1.width * p1.height, p2.width * p2.height)
       if (overlay / minarea > threshold){
         // 表示target元素被souce覆盖了！
-        console.log(`overlay / minarea = ${overlay / minarea}`)
         return target
       }
     }
