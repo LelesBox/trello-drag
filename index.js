@@ -54,79 +54,65 @@ function detect (elms) {
     }
     return -1
   }
-  // function cross()
+  // 成功则返回target
+  function getOVerlayElm (source, target, threshold) {
+    var p1 = source.getBoundingClientRect()
+    var p2 = target.getBoundingClientRect()
+    var overlayWidth = (Math.min(p1.bottom, p2.bottom) - Math.max(p1.top, p2.top))
+    var overlayHeight = (Math.min(p1.right, p2.right) - Math.max(p1.left, p2.left))
+    if (overlayWidth > 0 && overlayHeight > 0) {
+      var overlay = overlayWidth * overlayHeight
+      var minarea = Math.min(p1.width * p1.height, p2.width * p2.height)
+      if (overlay / minarea > threshold){
+        // 表示target元素被souce覆盖了！
+        console.log(`overlay / minarea = ${overlay / minarea}`)
+        return target
+      }
+    }
+    return null
+  }
   var length = elms.length
   var targetIdx = 0
   return function (elm, sourceElm, point) {
     var a = elm.getBoundingClientRect()
     var i = length, b
     var targetIdx = findIndex(elms, sourceElm)
-    // console.log($('.container')[0].contains(sourceElm))
-    // var ctn = sourceElm.nextSibling.parentNode
-    // console.log(el.parentNode.contains(sourceElm))
     while (i--) {
       el = elms[i]
       if (el === sourceElm) {
         continue
       }
-      b = el.getBoundingClientRect()
-      // 如果是跨容器，则只需关注插入的位置即可
-      // console.log(ctn.contains(sourceElm))
-      // if(!el.parentNode.contains(sourceElm)) {
-      //   return
-      // }
-      // 重叠检测 a（拖动值） 和 b
-      // 怎么样才算重叠
-      // 1. a的bottom和b的bottom的差值绝对值小于某值（比如B高度的一半）
-      // 2. a的left和b的left的距离的绝对值小于某值（比如B的宽的一半）
-      // if(false)
-      if (point.moveY - point.dY > 0) {
-        // 往下
-        if (Math.abs(b.bottom - a.bottom) < b.height * 0.2 && Math.abs(a.left - b.left) < b.width * 0.7) {
-        // if (a.top > b.top && Math.abs(a.left - b.left) < b.width * 0.7) {
-          // console.log(el.parentNode.contains(sourceElm))
-          // if (!el.parentNode.contains(sourceElm)) {
-            // if(el === el.parentNode.lastChild) {
-              // el.parentNode.insertBefore(sourceElm, el.nextSibling)
-            // } else {
-              // el.parentNode.insertBefore(sourceElm, el)
-            // }
-          // } else {
+      // 覆盖面积达到百分之七十的元素
+      // 1.如果该元素于sourceElm属于一个父容器，则
+      // 1.1 如果sourceElm粗线在el之前，则 insertBefore(sourceElm, el.nextSibling)
+      // 1.2 如果sourceElm粗线在el之后，则 insertBefore(sourceElm, el)
+      // 2. 如果el与sourceElm不属于同一个父容器
+      // 2.1 如果a.top > b.top 则 insertBefore(sourceElm, el.nextSibling)
+      // 2.2 如果 a.bottom < b.bottom 则 insertBefore(sourceElm, el)
+      if (el.parentNode === sourceElm.parentNode) {
+        if (getOVerlayElm(elm, el, 0.7)) {
+          if (targetIdx < i) {
             el.parentNode.insertBefore(sourceElm, el.nextSibling)
-          // }
-          exchange(elms, targetIdx, i)
-          point.dY = point.moveY
-          point.dX = point.moveX
+            exchange(elms, targetIdx, i)
+          } else if (targetIdx > i) {
+            el.parentNode.insertBefore(sourceElm, el)
+            exchange(elms, targetIdx, i)
+          }
           break;
         }
-      } else if (point.moveY - point.dY < 0) {
-        // 往上
-        if (Math.abs(a.bottom - b.bottom) < b.height * 0.2 && Math.abs(a.left - b.left) < b.width * 0.7) {
-          // console.log(el.parentNode.contains(sourceElm))
-          // el.parentNode.insertBefore(sourceElm, el)
-          // if (!el.parentNode.contains(sourceElm)) {
-          //   // el.parentNode.insertBefore(sourceElm, el)
-          //   if(el === el.parentNode.lastChild) {
-          //     el.parentNode.insertBefore(sourceElm, el.nextSibling)
-          //   } else {
-          //     el.parentNode.insertBefore(sourceElm, el)
-          //   }
-          // } else {
+      } else {
+        if (getOVerlayElm(elm, el, 0.3)) {
+          b = el.getBoundingClientRect()
+          if (a.top > b.top) {
+            el.parentNode.insertBefore(sourceElm, el.nextSibling)
+            exchange(elms, targetIdx, i)
+          } else if (a.bottom < b.bottom) {
             el.parentNode.insertBefore(sourceElm, el)
-          // }
-          exchange(elms, targetIdx, i)
-          point.dY = point.moveY
-          point.dX = point.moveX
+            exchange(elms, targetIdx, i)
+          }
           break;
         }
       }
-      // 第二种检测重叠基准 a,b
-      // 检测两个元素重叠部分的面积是否是a，b面积中最小的那个面积的（一半或者0.7）
-      // 然后检测改元素出现的位置，如果出现在b之前，则是插入b后面
-      // 如果出现在b之后，则插在b前面
-      // 如果a不存在于b的父容器中，
-      // 如果重叠元素是该容器最后一个元素，则插入该容器最后一位
-      // 否则则插入改元素之前
     }
   }
 }
