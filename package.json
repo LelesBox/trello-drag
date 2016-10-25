@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "browser-sync start --server --files \"*\" ",
+    "dev": "./node_modules/.bin/webpack --entry ./index.js --output-file ./bundle.js --progress --devtool sourceMap --watch",
     "start": "browser-sync start --server --files \"*\" | ./node_modules/.bin/webpack --entry ./index.js --output-file ./bundle.js --progress --devtool sourceMap --watch"
   },
   "repository": {
