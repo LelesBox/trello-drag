@@ -1,8 +1,41 @@
-// var off = function (element, event, handler) {
-//   if(element && event) {
+/* **********utils*********** */
+function on (element, event, handler) {
+  if (element && event && handler) {
+    if (element.length === 0) return
+    if (element.length) {
+      for (var i = 0; i < element.length; i++) {
+        element[i].addEventListener(event, handler, false)
+      }
+    } else {
+      element.addEventListener(event, handler, false)
+    }
+  }
+}
+
+// function off (element, event, handler) {
+//   if (element && event) {
 //     element.removeEventListener(event, handler, false)
 //   }
 // }
+function addClass (elm, clazz) {
+  elm.classList.add(clazz)
+}
+
+function removeClass (elm, clazz) {
+  elm.classList.remove(clazz)
+}
+
+function copyElm (elm) {
+  var el = elm.cloneNode(true)
+  el.style.position = 'fixed'
+  var position = elm.getBoundingClientRect()
+  el.style.margin = '0px'
+  el.style.top = position.top + 'px'
+  el.style.left = position.left + 'px'
+  el.style.zIndex = 9999
+  return el
+}
+
 function exchange (arr, idx, idx2) {
   var temp = arr[idx]
   arr[idx] = arr[idx2]
@@ -35,38 +68,7 @@ function getOVerlayElm (source, target, threshold) {
   return null
 }
 
-function on (element, event, handler) {
-  if (element && event && handler) {
-    if (element.length === 0) return
-    if (element.length) {
-      for (var i = 0; i < element.length; i++) {
-        element[i].addEventListener(event, handler, false)
-      }
-    } else {
-      element.addEventListener(event, handler, false)
-    }
-  }
-}
-
-function addClass (elm, clazz) {
-  elm.classList.add(clazz)
-}
-
-function removeClass (elm, clazz) {
-  elm.classList.remove(clazz)
-}
-
-function copyElm (elm) {
-  var el = elm.cloneNode(true)
-  el.style.position = 'fixed'
-  var position = elm.getBoundingClientRect()
-  el.style.margin = '0px'
-  el.style.top = position.top + 'px'
-  el.style.left = position.left + 'px'
-  el.style.zIndex = 9999
-  return el
-}
-
+/* **********core*********** */
 function applyDrag (elms) {
   elms = Array.prototype.slice.call(elms, 0)
   var length = elms.length
@@ -119,7 +121,7 @@ function applyDrag (elms) {
 function drag (elms) {
   var target = null
   var source = null
-  var applyd = applyDrag(elms)
+  _updateView = updateView(elms)
   var point = {
     startX: 0,
     startY: 0,
@@ -131,7 +133,7 @@ function drag (elms) {
       point.moveX = e.clientX
       point.moveY = e.clientY
       move(target, point)
-      applyd(target, source, point)
+      _updateView(target, source, point)
     }
   })
 
@@ -144,19 +146,40 @@ function drag (elms) {
   })
 
   on(elms, 'mousedown', function (e) {
-    point.startX = e.clientX
-    point.startY = e.clientY
-    setTimeout(function () {
-      source = e.target
-      target = copyElm(source)
-      addClass(source, 'mask')
-      document.body.appendChild(target)
-    })
+    if (e.target.dataset.drag !== undefined) {
+      point.startX = e.clientX
+      point.startY = e.clientY
+      setTimeout(function () {
+        source = e.target
+        target = copyElm(source)
+        addClass(source, 'mask')
+        document.body.appendChild(target)
+      })
+    }
   })
+  return {
+    update: function () {
+      _updateView = updateView(elms)
+    }
+  }
 }
 
 function move (elm, point) {
   elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
+}
+
+var _updateView
+function updateView (container) {
+  var elms = []
+  if (container.length !== undefined) {
+    for (var i = 0, l = container.length; i < l; i++) {
+      var children = container[i].querySelectorAll('[data-drag]')
+      elms = elms.concat(Array.prototype.slice.call(children, 0))
+    }
+  } else {
+    elms = Array.prototype.slice.call(container.querySelectorAll('[data-drag]'), 0)
+  }
+  return applyDrag(elms)
 }
 
 module.exports = drag
