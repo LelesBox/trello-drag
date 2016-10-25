@@ -15,7 +15,7 @@ for (var j = 0; j < 10; j++) {
 $('.container')[1].innerHTML = inhtm2
 var d = drag($('.container'))
 
-window.add = () => {
+window.add = function () {
   $('.container')[1].appendChild(gelement())
   d.update()
 }

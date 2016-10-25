@@ -12,11 +12,6 @@ function on (element, event, handler) {
   }
 }
 
-// function off (element, event, handler) {
-//   if (element && event) {
-//     element.removeEventListener(event, handler, false)
-//   }
-// }
 function addClass (elm, clazz) {
   elm.classList.add(clazz)
 }
@@ -70,7 +65,6 @@ function getOVerlayElm (source, target, threshold) {
 
 /* **********core*********** */
 function applyDrag (elms) {
-  elms = Array.prototype.slice.call(elms, 0)
   var length = elms.length
   return function (elm, sourceElm, point) {
     var a = elm.getBoundingClientRect()
