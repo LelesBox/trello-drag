@@ -51,11 +51,11 @@
 	}
 	var inhtm = ''
 	var inhtm2 = ''
-	for (var i = 0; i < 10; i++) {
+	for (var i = 0; i < 5; i++) {
 	  inhtm += `<div class="drag" data-drag style="background-color:${randomColor()}"></div>`
 	}
 	$('.container')[0].innerHTML = inhtm
-	for (var j = 0; j < 10; j++) {
+	for (var j = 0; j < 5; j++) {
 	  inhtm2 += `<div class="drag" data-drag style="background-color:${randomColor()}"></div>`
 	}
 	$('.container')[1].innerHTML = inhtm2
