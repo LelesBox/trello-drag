@@ -13,7 +13,9 @@ var on = function (element, event, handler) {
   if(element && event && handler) {
     if(element.length === 0) return
     if(element.length) {
-      element.forEach(elm => elm.addEventListener(event, handler, false))
+      for (var i = 0; i < element.length; i++) {
+        element[i].addEventListener(event, handler, false)
+      }
     } else {
       element.addEventListener(event, handler, false)
     }
