@@ -50,83 +50,8 @@
     </style>
   </head>
   <body>
-    <div class="container">
-    </div>
-    <div class="container">
-      <div class="drag drag2">2</div>
-      <div class="drag drag2" style="background-color:yellow">3</div>
-      <div class="drag drag2" style="background-color:green">4</div>
-    </div>
-    <script type="text/javascript" src="./index.js">
-    </script>
-    <script type="text/javascript">
-    var container = $('.container')[0]
-    var inhtm = '', inhtm2 = ''
-    for (var i = 0; i < 10; i++) {
-      inhtm += `<div class="drag" style="background-color:${randomColor()}"></div>`
-    }
-    $('.container')[0].innerHTML = inhtm
-    for (var i = 0; i < 10; i++) {
-      inhtm2 += `<div class="drag" style="background-color:${randomColor()}"></div>`
-    }
-    $('.container')[1].innerHTML = inhtm2
-    var isDrag = false
-    var target = null
-    var sourceTarget = null
-    var holderElm = null
-    var pointer = {
-      startX: 0,
-      startY: 0,
-      dX: 0,
-      dY: 0,
-      moveX: 0,
-      moveY: 0
-    }
-
-    on(document, 'mousemove', (e) => {
-      if(target !== null){
-        pointer.moveX = e.clientX
-        pointer.moveY = e.clientY
-        move(target, pointer, true)
-      }
-    })
-
-    on(document, 'mouseup', () => {
-      isDrag = false
-      if(target) {
-        document.body.removeChild(target)
-        removeClass(sourceTarget, 'mask')
-        target = null
-      }
-    })
-
-    on($('.drag'), 'mousedown', function(e) {
-      pointer.startX = e.clientX
-      pointer.startY = e.clientY
-      pointer.dX = e.clientX
-      pointer.dY = e.clientY
-      setTimeout(() => {
-        isDrag = true
-        sourceTarget = e.target
-        target = copyElm(sourceTarget)
-        addClass(sourceTarget, 'mask')
-        document.body.appendChild(target)
-      })
-    })
-
-    var det1 = detect($('.drag'))
-    function move(elm, point, isdrag) {
-      if(isdrag) {
-        elm.style.transform = `translate3d(${pointer.moveX - pointer.startX}px, ${pointer.moveY - pointer.startY}px, 0) rotate(5deg)`
-      } else {
-        elm.style.transform = `translate3d(${pointer.moveX - pointer.startX}px, ${pointer.moveY - pointer.startY}px, 0)`
-      }
-      det1(elm, sourceTarget, point)
-    }
-
-    function randomColor () {
-      return `rgba(${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, 1)`
-    }
-    </script>
+    <div class="container"></div>
+    <div class="container"></div>
+    <script type="text/javascript" src="./bundle.js"></script>
   </body>
 </html>

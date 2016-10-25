@@ -1,0 +1,23 @@
+{
+  "name": "drag",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "browser-sync start --server --files \"*\" | ./node_modules/.bin/webpack --entry ./index.js --output-file ./bundle.js --progress --devtool sourceMap --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github2:LelesBox/trello-drag.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^3.8.1",
+    "eslint-config-standard": "^6.2.0",
+    "eslint-plugin-promise": "^3.3.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "webpack": "^1.13.2"
+  }
+}
