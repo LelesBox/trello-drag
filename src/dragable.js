@@ -2,12 +2,13 @@ import { on, addClass, removeClass } from './domApi'
 
 function copyElm (elm) {
   var el = elm.cloneNode(true)
-  el.style.position = 'fixed'
+  el.style.position = 'absolute'
   var position = elm.getBoundingClientRect()
   el.style.margin = '0px'
   el.style.top = position.top + 'px'
   el.style.left = position.left + 'px'
   el.style.zIndex = 9999
+  el.style.width = elm.clientWidth + 'px'
   return el
 }
 
@@ -178,6 +179,8 @@ style.innerHTML = `.drag-mask::after {
 }
 [drag] {
   position: relative;
+  cursor: pointer;
+  box-sizing: border-box;
 }`
 
 document.getElementsByTagName('head')[0].appendChild(style)

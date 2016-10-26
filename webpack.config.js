@@ -1,12 +1,11 @@
 var path = require('path')
-var webpack = require('webpack')
 
 module.exports = {
-  entry: './src/drag.js',
+  entry: './src/dragable.js',
   output: {
-    library: 'drag',
+    library: 'dragable',
     libraryTarget: 'umd',
-    filename: 'drag.js',
+    filename: 'dragable.js',
     path: path.resolve(__dirname, './dist/')
   },
   module: {

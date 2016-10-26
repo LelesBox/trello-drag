@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["drag"] = factory();
+		exports["dragable"] = factory();
 	else
-		root["drag"] = factory();
+		root["dragable"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -60,12 +60,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function copyElm(elm) {
 	  var el = elm.cloneNode(true);
-	  el.style.position = 'fixed';
+	  el.style.position = 'absolute';
 	  var position = elm.getBoundingClientRect();
 	  el.style.margin = '0px';
 	  el.style.top = position.top + 'px';
 	  el.style.left = position.left + 'px';
 	  el.style.zIndex = 9999;
+	  el.style.width = elm.clientWidth + 'px';
 	  return el;
 	}
 	
@@ -220,7 +221,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// 生成drag-mask样式
 	var style = document.createElement('style');
-	style.innerHTML = '.drag-mask::after {\n  content: "";\n  position: absolute;\n  top:0;\n  left:0;\n  width: 100%;\n  height: 100%;\n  background-color: #c0c6ca;\n  user-select: none;\n  -webkit-user-select:none;\n  -moz-user-select: none;\n  z-index: 9999;\n  border-radius: 4px;\n}\n[drag] {\n  position: relative;\n  cursor: pointer;\n}';
+	style.innerHTML = '.drag-mask::after {\n  content: "";\n  position: absolute;\n  top:0;\n  left:0;\n  width: 100%;\n  height: 100%;\n  background-color: #c0c6ca;\n  user-select: none;\n  -webkit-user-select:none;\n  -moz-user-select: none;\n  z-index: 9999;\n  border-radius: 4px;\n}\n[drag] {\n  position: relative;\n  cursor: pointer;\n  box-sizing: border-box;\n}';
 	
 	document.getElementsByTagName('head')[0].appendChild(style);
 	
@@ -337,4 +338,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=drag.js.map
+//# sourceMappingURL=dragable.js.map

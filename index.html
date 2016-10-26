@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>trello</title>
+    <title>trello-drag</title>
     <style media="screen">
       body {
         background-color: #0079bf;
@@ -12,19 +12,19 @@
         width: 200px;
         float: left;
         margin: 20px 0px 20px 90px;
+        padding: 30px 10px 10px 10px;
         user-select: none;
         -webkit-user-select:none;
         -moz-user-select: none;
-        padding-top: 30px;
-        padding-bottom: 30px;
         background-color: #e2e4e6;
         border-radius: 4px;
         cursor: pointer;
       }
+
       .drag {
         height: 80px;
-        width: 180px;
-        margin: 10px;
+        width: 100%;
+        margin: 10px 0;
         background-color: red;
         cursor: pointer;
         display: flex;
@@ -35,47 +35,67 @@
         -moz-user-select: none;
         border-radius: 4px;
       }
+      .addone {
+        background-color: #c0c6ca;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        color: #eee;
+      }
+      .co::after {
+        content: "";
+        display: block;
+        visibility: hidden;
+        height: 0px;
+        clear: both;
+      }
     </style>
   </head>
   <body>
     <div class="co">
-      <div class="container" drag></div>
-      <div class="container" drag></div>
-      <div class="container" drag></div>
+      <div class="container" drag>
+        <div class="addone">+</div>
+      </div>
+      <div class="container" drag>
+        <div class="addone">+</div>
+      </div>
+      <div class="container" drag>
+        <div class="addone">+</div>
+      </div>
     </div>
-    <script type="text/javascript" src="./dist/drag.js"></script>
+    <script type="text/javascript" src="./dist/dragable.js"></script>
     <script type="text/javascript">
       function $ (sel) {
         return document.querySelectorAll(sel)
       }
-      $('.container')[0].innerHTML = getChildrenHTML(3)
-      $('.container')[1].innerHTML = getChildrenHTML(4)
-      $('.container')[2].innerHTML = getChildrenHTML(5)
-      var d = drag($('.container'))
-      var dd = drag($('.co'))
+      $('.container')[0].insertBefore(getChildren(3), $('.container')[0].children[0])
+      $('.container')[1].insertBefore(getChildren(4), $('.container')[1].children[0])
+      $('.container')[2].insertBefore(getChildren(5), $('.container')[2].children[0])
+      var d = dragable($('.container'))
+      var dd = dragable($('.co'))
       function randomColor () {
         return `rgba(${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, 1)`
       }
-
-      function getChildrenHTML (number) {
-        var inthml = ''
+      function getChildren (number) {
+        var fragement = document.createDocumentFragment()
         for (var i = 0; i < number; i++) {
-          inthml += `<div class="drag" drag style="background-color:${randomColor()}"></div>`
+          var el = document.createElement('div')
+          el.className = 'drag'
+          el.setAttribute('drag', '')
+          el.style.backgroundColor = randomColor()
+          fragement.appendChild(el)
         }
-        return inthml
+        return fragement
       }
 
-      function gelement () {
-      var div = document.createElement('div')
-      div.className = 'drag'
-      div.setAttribute('drag', '')
-      div.style.backgroundColor = randomColor()
-        return div
-      }
-      add = function () {
-        $('.container')[1].appendChild(gelement())
-        d.update()
-      }
+      document.addEventListener('click', function (e) {
+        if (e.target.className === 'addone') {
+          e.target.parentNode.insertBefore(getChildren(1), e.target.parentNode.children[e.target.parentNode.children.length - 1])
+          d.update()
+        }
+      })
     </script>
   </body>
 </html>
