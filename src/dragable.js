@@ -46,10 +46,12 @@ function getOVerlayElm (source, target, threshold) {
 
 /* **********core*********** */
 function applyDrag (container) {
+  var containers = []
   var elms = []
   if (container.length !== undefined) {
     for (var i = 0, l = container.length; i < l; i++) {
       var children = container[i].children
+      containers.push(container[i])
       for (var j = 0, jlength = children.length; j < jlength; j++) {
         if (children[j].getAttribute('drag') !== null) {
           elms.push(children[j])
@@ -57,6 +59,7 @@ function applyDrag (container) {
       }
     }
   } else {
+    containers.push(container)
     children = container.children
     for (var k = 0, klength = children.length; k < klength; k++) {
       if (children[k].getAttribute('drag') !== null) {
@@ -65,13 +68,31 @@ function applyDrag (container) {
     }
   }
   var length = elms.length
+  var clength = containers.length
   return function (elm, sourceElm, point) {
     elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
     var a = elm.getBoundingClientRect()
     var el
     var i = length
+    var j = clength
     var b
     var targetIdx = findIndex(elms, sourceElm)
+    // 便利完同类元素后
+    // 还要判断它们的容器，是否与容器重合且容器为空，如果为空则添加到空容器中
+    while (j--) {
+      var cot = containers[j]
+      if (cot === sourceElm.parentNode) continue
+      console.log(cot.children.length)
+      console.log(getOVerlayElm(elm, cot.parentNode, 0.7))
+      if (cot.children.length === 0 && getOVerlayElm(elm, cot.parentNode, 0.7)) {
+        console.log(123)
+      }
+      // if (cot.children.length === 0) {
+      //   // console.log('插入空容器')
+      //   cot.appendChild(sourceElm)
+      //   return
+      // }
+    }
     while (i--) {
       el = elms[i]
       if (el === sourceElm) {
@@ -93,20 +114,18 @@ function applyDrag (container) {
             el.parentNode.insertBefore(sourceElm, el)
             exchange(elms, targetIdx, i)
           }
-          break
+          return
         }
-      } else {
-        if (getOVerlayElm(elm, el, 0.3)) {
-          b = el.getBoundingClientRect()
-          if (a.top > b.top) {
-            el.parentNode.insertBefore(sourceElm, el.nextSibling)
-            exchange(elms, targetIdx, i)
-          } else if (a.bottom < b.bottom) {
-            el.parentNode.insertBefore(sourceElm, el)
-            exchange(elms, targetIdx, i)
-          }
-          break
+      } else if (getOVerlayElm(elm, el, 0.3)) {
+        b = el.getBoundingClientRect()
+        if (a.top > b.top) {
+          el.parentNode.insertBefore(sourceElm, el.nextSibling)
+          exchange(elms, targetIdx, i)
+        } else if (a.bottom < b.bottom) {
+          el.parentNode.insertBefore(sourceElm, el)
+          exchange(elms, targetIdx, i)
         }
+        return
       }
     }
   }

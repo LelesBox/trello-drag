@@ -51,17 +51,27 @@
         height: 0px;
         clear: both;
       }
+      /*.wrap::after {
+        content: "";
+        display: block;
+        visibility: hidden;
+        height: 0px;
+        clear: both;
+      }*/
     </style>
   </head>
   <body>
     <div class="co">
       <div class="container" drag>
+        <div class="blocks"></div>
         <div class="addone">+</div>
       </div>
       <div class="container" drag>
+        <div class="blocks"></div>
         <div class="addone">+</div>
       </div>
       <div class="container" drag>
+        <div class="blocks"></div>
         <div class="addone">+</div>
       </div>
     </div>
@@ -70,10 +80,10 @@
       function $ (sel) {
         return document.querySelectorAll(sel)
       }
-      $('.container')[0].insertBefore(getChildren(3), $('.container')[0].children[0])
-      $('.container')[1].insertBefore(getChildren(4), $('.container')[1].children[0])
-      $('.container')[2].insertBefore(getChildren(5), $('.container')[2].children[0])
-      var d = dragable($('.container'))
+      $('.blocks')[0].appendChild(getChildren(3))
+      $('.blocks')[1].appendChild(getChildren(4))
+      $('.blocks')[2].appendChild(getChildren(5))
+      var d = dragable($('.blocks'))
       var dd = dragable($('.co'))
       function randomColor () {
         return `rgba(${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, 1)`
