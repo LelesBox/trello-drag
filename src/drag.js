@@ -1,24 +1,4 @@
-/* **********utils*********** */
-function on (element, event, handler) {
-  if (element && event && handler) {
-    if (element.length === 0) return
-    if (element.length) {
-      for (var i = 0; i < element.length; i++) {
-        element[i].addEventListener(event, handler, false)
-      }
-    } else {
-      element.addEventListener(event, handler, false)
-    }
-  }
-}
-
-function addClass (elm, clazz) {
-  elm.classList.add(clazz)
-}
-
-function removeClass (elm, clazz) {
-  elm.classList.remove(clazz)
-}
+import { on, addClass, removeClass } from './domApi'
 
 function copyElm (elm) {
   var el = elm.cloneNode(true)
@@ -199,6 +179,7 @@ style.innerHTML = `.drag-mask::after {
 [drag] {
   position: relative;
 }`
+
 document.getElementsByTagName('head')[0].appendChild(style)
 
 module.exports = function (elms) {

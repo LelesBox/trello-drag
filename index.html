@@ -9,9 +9,7 @@
       }
 
       .container {
-        position: relative;
         width: 200px;
-        /*margin-left: 90px;*/
         float: left;
         margin: 20px 0px 20px 90px;
         user-select: none;
@@ -24,7 +22,6 @@
         cursor: pointer;
       }
       .drag {
-        position: relative;
         height: 80px;
         width: 180px;
         margin: 10px;
@@ -36,7 +33,6 @@
         user-select: none;
         -webkit-user-select:none;
         -moz-user-select: none;
-        z-index: 998;
         border-radius: 4px;
       }
     </style>
@@ -47,6 +43,39 @@
       <div class="container" drag></div>
       <div class="container" drag></div>
     </div>
-    <script type="text/javascript" src="./bundle.js"></script>
+    <script type="text/javascript" src="./dist/drag.js"></script>
+    <script type="text/javascript">
+      function $ (sel) {
+        return document.querySelectorAll(sel)
+      }
+      $('.container')[0].innerHTML = getChildrenHTML(3)
+      $('.container')[1].innerHTML = getChildrenHTML(4)
+      $('.container')[2].innerHTML = getChildrenHTML(5)
+      var d = drag($('.container'))
+      var dd = drag($('.co'))
+      function randomColor () {
+        return `rgba(${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, 1)`
+      }
+
+      function getChildrenHTML (number) {
+        var inthml = ''
+        for (var i = 0; i < number; i++) {
+          inthml += `<div class="drag" drag style="background-color:${randomColor()}"></div>`
+        }
+        return inthml
+      }
+
+      function gelement () {
+      var div = document.createElement('div')
+      div.className = 'drag'
+      div.setAttribute('drag', '')
+      div.style.backgroundColor = randomColor()
+        return div
+      }
+      add = function () {
+        $('.container')[1].appendChild(gelement())
+        d.update()
+      }
+    </script>
   </body>
 </html>
