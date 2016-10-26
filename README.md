@@ -13,7 +13,7 @@
 </div>
 <script type="text/javascript" src="./dist/dragable.js"></script>
 <script type="text/javascript">
-  var containerDrag = drag(document.querySelectorAll(".container"))
+  var containerDrag = dragable(document.querySelectorAll(".container"))
 </script>
 ```
 ### [demo](https://lelesbox.github.io/trello-drag/)
