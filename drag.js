@@ -64,9 +64,28 @@ function getOVerlayElm (source, target, threshold) {
 }
 
 /* **********core*********** */
-function applyDrag (elms) {
+function applyDrag (container) {
+  var elms = []
+  if (container.length !== undefined) {
+    for (var i = 0, l = container.length; i < l; i++) {
+      var children = container[i].children
+      for (var j = 0, jlength = children.length; j < jlength; j++) {
+        if (children[j].getAttribute('drag') !== null) {
+          elms.push(children[j])
+        }
+      }
+    }
+  } else {
+    children = container.children
+    for (var k = 0, klength = children.length; k < klength; k++) {
+      if (children[k].getAttribute('drag') !== null) {
+        elms.push(children[j])
+      }
+    }
+  }
   var length = elms.length
   return function (elm, sourceElm, point) {
+    elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
     var a = elm.getBoundingClientRect()
     var el
     var i = length
@@ -77,13 +96,13 @@ function applyDrag (elms) {
       if (el === sourceElm) {
         continue
       }
-      // 覆盖面积达到百分之七十的元素
-      // 1.如果该元素于sourceElm属于一个父容器，则
-      // 1.1 如果sourceElm粗线在el之前，则 insertBefore(sourceElm, el.nextSibling)
-      // 1.2 如果sourceElm粗线在el之后，则 insertBefore(sourceElm, el)
-      // 2. 如果el与sourceElm不属于同一个父容器
-      // 2.1 如果a.top > b.top 则 insertBefore(sourceElm, el.nextSibling)
-      // 2.2 如果 a.bottom < b.bottom 则 insertBefore(sourceElm, el)
+        // 覆盖面积达到百分之七十的元素
+        // 1.如果该元素于sourceElm属于一个父容器，则
+        // 1.1 如果sourceElm粗线在el之前，则 insertBefore(sourceElm, el.nextSibling)
+        // 1.2 如果sourceElm粗线在el之后，则 insertBefore(sourceElm, el)
+        // 2. 如果el与sourceElm不属于同一个父容器
+        // 2.1 如果a.top > b.top 则 insertBefore(sourceElm, el.nextSibling)
+        // 2.2 如果 a.bottom < b.bottom 则 insertBefore(sourceElm, el)
       if (el.parentNode === sourceElm.parentNode) {
         if (getOVerlayElm(elm, el, 0.7)) {
           if (targetIdx < i) {
@@ -112,68 +131,89 @@ function applyDrag (elms) {
   }
 }
 
-function drag (elms) {
-  var target = null
-  var source = null
-  _updateView = updateView(elms)
-  var point = {
-    startX: 0,
-    startY: 0,
-    moveX: 0,
-    moveY: 0
+// 给每个容器打标签
+var idx = 0
+// 存放各个容器下的updateView方法
+var updateViews = {}
+var _updateView = null
+// 拖动的元素，拖动的时候其实它是source创建出来的副本
+var target = null
+// 选中的拖动元素
+var source = null
+var point = {
+  startX: 0,
+  startY: 0,
+  moveX: 0,
+  moveY: 0
+}
+// 监听全局鼠标按下事件
+// 如果该元素包含drag属性，则启用drag方法
+on(document, 'mousedown', function (e) {
+  if (e.target.getAttribute('drag') !== null) {
+    point.startX = e.clientX
+    point.startY = e.clientY
+    var dragId = e.target.parentNode.getAttribute('drag-id')
+    if (dragId === undefined) return
+    _updateView = updateViews[dragId]
+    setTimeout(function () {
+      source = e.target
+      target = copyElm(source)
+      addClass(source, 'drag-mask')
+      document.body.appendChild(target)
+    })
   }
-  on(document, 'mousemove', function (e) {
-    if (target !== null) {
-      point.moveX = e.clientX
-      point.moveY = e.clientY
-      move(target, point)
-      _updateView(target, source, point)
-    }
-  })
+})
 
-  on(document, 'mouseup', function () {
-    if (target) {
-      document.body.removeChild(target)
-      removeClass(source, 'mask')
-      target = null
-    }
-  })
+on(document, 'mousemove', function (e) {
+  if (target !== null) {
+    point.moveX = e.clientX
+    point.moveY = e.clientY
+    _updateView(target, source, point)
+  }
+})
 
-  on(elms, 'mousedown', function (e) {
-    if (e.target.dataset.drag !== undefined) {
-      point.startX = e.clientX
-      point.startY = e.clientY
-      setTimeout(function () {
-        source = e.target
-        target = copyElm(source)
-        addClass(source, 'mask')
-        document.body.appendChild(target)
-      })
+on(document, 'mouseup', function () {
+  if (target) {
+    document.body.removeChild(target)
+    removeClass(source, 'drag-mask')
+    target = null
+  }
+})
+
+// 生成drag-mask样式
+var style = document.createElement('style')
+style.innerHTML = `.drag-mask::after {
+  content: "";
+  position: absolute;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  background-color: #c0c6ca;
+  user-select: none;
+  -webkit-user-select:none;
+  -moz-user-select: none;
+  z-index: 9999;
+  border-radius: 4px;
+}
+[drag] {
+  position: relative;
+}`
+document.getElementsByTagName('head')[0].appendChild(style)
+
+module.exports = function (elms) {
+  var index = idx++
+  if (elms.length === undefined) {
+    elms.setAttribute('drag-id', index)
+  } else {
+    for (var i = 0, l = elms.length; i < l; i++) {
+      elms[i].setAttribute('drag-id', index)
     }
-  })
+  }
+  updateViews[index] = applyDrag(elms)
   return {
     update: function () {
-      _updateView = updateView(elms)
+      updateViews[index] = applyDrag(elms)
     }
   }
 }
-
-function move (elm, point) {
-  elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
-}
-
-var _updateView
-function updateView (container) {
-  var elms = []
-  if (container.length !== undefined) {
-    for (var i = 0, l = container.length; i < l; i++) {
-      var children = container[i].querySelectorAll('[data-drag]')
-      elms = elms.concat(Array.prototype.slice.call(children, 0))
-    }
-  } else {
-    elms = Array.prototype.slice.call(container.querySelectorAll('[data-drag]'), 0)
-  }
-  return applyDrag(elms)
-}
-
-module.exports = drag

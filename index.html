@@ -5,20 +5,24 @@
     <title>trello</title>
     <style media="screen">
       body {
-        background-color: #eee;
+        background-color: #0079bf;
       }
 
       .container {
         position: relative;
         width: 200px;
-        margin-left: 90px;
+        /*margin-left: 90px;*/
         float: left;
-        transition: all .5s;
+        margin: 20px 0px 20px 90px;
         user-select: none;
         -webkit-user-select:none;
         -moz-user-select: none;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        background-color: #e2e4e6;
+        border-radius: 4px;
+        cursor: pointer;
       }
-
       .drag {
         position: relative;
         height: 80px;
@@ -33,26 +37,15 @@
         -webkit-user-select:none;
         -moz-user-select: none;
         z-index: 998;
-      }
-
-      .mask::after {
-        content: "";
-        position: absolute;
-        top:0;
-        left:0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(222, 222, 222, 1);
-        user-select: none;
-        -webkit-user-select:none;
-        -moz-user-select: none;
+        border-radius: 4px;
       }
     </style>
   </head>
   <body>
-    <div class="container"></div>
-    <div class="container">
-      <!-- <div class="drag"></div> -->
+    <div class="co">
+      <div class="container" drag></div>
+      <div class="container" drag></div>
+      <div class="container" drag></div>
     </div>
     <script type="text/javascript" src="./bundle.js"></script>
   </body>
