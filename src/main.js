@@ -41,7 +41,8 @@ var point = {
 }
 var scroll = false
 on($('.co')[0], 'mousedown', function (e) {
-  if (e.button === 0 && e.target === this) {
+  console.log('mousedown', e.target)
+  if (!scroll && e.button === 0 && e.target === this) {
     point.startX = e.clientX
     point.startY = e.clientY
     point.offsetLeft = document.documentElement.scrollLeft || document.body.scrollLeft
@@ -51,10 +52,17 @@ on($('.co')[0], 'mousedown', function (e) {
 })
 on($('.co')[0], 'mousemove', function (e) {
   if (scroll) {
+    console.log('mousemove', e.target)
     var offsetX = point.startX - e.clientX
+    console.log(offsetX)
     window.scrollTo(point.offsetLeft + offsetX, document.documentElement.scrollTop || document.body.scrollTop)
   }
 })
 on($('.co')[0], 'mouseup', function (e) {
+  console.log('mouseup', e.target)
+  scroll = false
+})
+on($('.co')[0], 'mouseleave', function (e) {
+  console.log('mouseleave', e.target)
   scroll = false
 })
