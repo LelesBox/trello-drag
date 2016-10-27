@@ -12,7 +12,6 @@ var webpackConfig = merge(baseConfig, {
     libraryTarget: 'umd',
     path: path.resolve(__dirname, '../release/')
   },
-  devtool: '#source-map',
   plugins: [
     new webpack.DefinePlugin({
       'process.env': 'production'
