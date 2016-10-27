@@ -142,7 +142,7 @@ var point = {
 // 监听全局鼠标按下事件
 // 如果该元素包含drag属性，则启用drag方法
 on(document, 'mousedown', function (e) {
-  if (e.target.getAttribute('drag') !== null) {
+  if (e.button === 0 && e.target.getAttribute('drag') !== null) {
     point.startX = e.clientX
     point.startY = e.clientY
     var dragId = e.target.parentNode.getAttribute('drag-id')

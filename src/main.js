@@ -1,4 +1,5 @@
 import dragable from './dragable'
+import { on } from './domApi'
 
 function $ (sel) {
   return document.querySelectorAll(sel)
@@ -31,4 +32,29 @@ document.addEventListener('click', function (e) {
     blocks.appendChild(getChildren(1))
     d.update()
   }
+})
+
+var point = {
+  startX: 0,
+  startY: 0,
+  offsetLeft: 0
+}
+var scroll = false
+on($('.co')[0], 'mousedown', function (e) {
+  if (e.button === 0 && e.target === this) {
+    point.startX = e.clientX
+    point.startY = e.clientY
+    point.offsetLeft = document.documentElement.scrollLeft || document.body.scrollLeft
+    scroll = true
+  }
+  return
+})
+on($('.co')[0], 'mousemove', function (e) {
+  if (scroll) {
+    var offsetX = point.startX - e.clientX
+    window.scrollTo(point.offsetLeft + offsetX, document.documentElement.scrollTop || document.body.scrollTop)
+  }
+})
+on($('.co')[0], 'mouseup', function (e) {
+  scroll = false
 })
