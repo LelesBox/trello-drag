@@ -4,14 +4,33 @@
     <meta charset="utf-8">
     <title>trello-drag</title>
     <style media="screen">
+      html {
+        height: 100%;
+      }
       body {
         background-color: #0079bf;
+        height: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-
+      .co {
+        height: 100%;
+        overflow-x:scroll;
+        white-space:nowrap;
+      }
+      .co::after {
+        content: "";
+        display: block;
+        visibility: hidden;
+        height: 0px;
+        clear: both;
+      }
       .container {
         width: 200px;
-        float: left;
-        margin: 20px 0px 20px 90px;
+        display: inline-block;
+        vertical-align: top;
+        margin: 20px 20px 20px 0;
         padding: 30px 10px 10px 10px;
         user-select: none;
         -webkit-user-select:none;
@@ -20,7 +39,9 @@
         border-radius: 4px;
         cursor: pointer;
       }
-
+      .container:first-child {
+        margin-left: 20px;
+      }
       .drag {
         height: 80px;
         width: 100%;
@@ -44,17 +65,26 @@
         font-size: 20px;
         color: #eee;
       }
-      .co::after {
-        content: "";
-        display: block;
-        visibility: hidden;
-        height: 0px;
-        clear: both;
-      }
     </style>
   </head>
   <body>
     <div class="co">
+      <div class="container" drag>
+        <div class="blocks"></div>
+        <div class="addone">+</div>
+      </div>
+      <div class="container" drag>
+        <div class="blocks"></div>
+        <div class="addone">+</div>
+      </div>
+      <div class="container" drag>
+        <div class="blocks"></div>
+        <div class="addone">+</div>
+      </div>
+      <div class="container" drag>
+        <div class="blocks"></div>
+        <div class="addone">+</div>
+      </div>
       <div class="container" drag>
         <div class="blocks"></div>
         <div class="addone">+</div>

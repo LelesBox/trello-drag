@@ -3,10 +3,12 @@ import { on, addClass, removeClass } from './domApi'
 function copyElm (elm) {
   var el = elm.cloneNode(true)
   el.style.position = 'absolute'
+  var offsetX = document.documentElement.scrollLeft || document.body.scrollLeft
+  var offsetY = document.documentElement.scrollTop || document.body.scrollTop
   var position = elm.getBoundingClientRect()
   el.style.margin = '0px'
-  el.style.top = position.top + 'px'
-  el.style.left = position.left + 'px'
+  el.style.top = position.top + offsetY + 'px'
+  el.style.left = position.left + offsetX + 'px'
   el.style.zIndex = 9999
   el.style.width = elm.clientWidth + 'px'
   return el

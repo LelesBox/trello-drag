@@ -3,11 +3,12 @@ import dragable from './dragable'
 function $ (sel) {
   return document.querySelectorAll(sel)
 }
-$('.blocks')[0].appendChild(getChildren(3))
-$('.blocks')[1].appendChild(getChildren(4))
-$('.blocks')[2].appendChild(getChildren(5))
-var d = dragable($('.blocks'))
-var dd = dragable($('.co'))
+var i = 7
+var j = 0
+while (i--) {
+  var l = ++j + 1
+  $('.blocks')[i].appendChild(getChildren(l))
+}
 function randomColor () {
   return `rgba(${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, ${Math.round(Math.random() * 255)}, 1)`
 }
@@ -22,7 +23,8 @@ function getChildren (number) {
   }
   return fragement
 }
-
+var d = dragable($('.blocks'))
+dragable($('.co'))
 document.addEventListener('click', function (e) {
   if (e.target.className === 'addone') {
     var blocks = e.target.parentNode.children[0]
