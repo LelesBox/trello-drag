@@ -102,7 +102,8 @@
 
       document.addEventListener('click', function (e) {
         if (e.target.className === 'addone') {
-          e.target.parentNode.insertBefore(getChildren(1), e.target.parentNode.children[e.target.parentNode.children.length - 1])
+          var blocks = e.target.parentNode.children[0]
+          blocks.appendChild(getChildren(1))
           d.update()
         }
       })

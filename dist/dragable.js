@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  return -1;
 	}
-	// 成功则返回target
+	// 成功则返回target 能不能用VDOM保存起来这些数据
 	function getOVerlayElm(source, target, threshold) {
 	  var p1 = source.getBoundingClientRect();
 	  var p2 = target.getBoundingClientRect();
@@ -135,21 +135,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var j = clength;
 	    var b;
 	    var targetIdx = findIndex(elms, sourceElm);
-	    // 便利完同类元素后
-	    // 还要判断它们的容器，是否与容器重合且容器为空，如果为空则添加到空容器中
+	    // 判断它们的容器，是否与容器重合且容器为空，如果为空则添加到空容器中
 	    while (j--) {
 	      var cot = containers[j];
 	      if (cot === sourceElm.parentNode) continue;
-	      console.log(cot.children.length);
-	      console.log(getOVerlayElm(elm, cot.parentNode, 0.7));
 	      if (cot.children.length === 0 && getOVerlayElm(elm, cot.parentNode, 0.7)) {
-	        console.log(123);
+	        cot.appendChild(sourceElm);
+	        return;
 	      }
-	      // if (cot.children.length === 0) {
-	      //   // console.log('插入空容器')
-	      //   cot.appendChild(sourceElm)
-	      //   return
-	      // }
 	    }
 	    while (i--) {
 	      el = elms[i];
@@ -178,10 +171,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        b = el.getBoundingClientRect();
 	        if (a.top > b.top) {
 	          el.parentNode.insertBefore(sourceElm, el.nextSibling);
-	          exchange(elms, targetIdx, i);
 	        } else if (a.bottom < b.bottom) {
 	          el.parentNode.insertBefore(sourceElm, el);
-	          exchange(elms, targetIdx, i);
 	        }
 	        return;
 	      }
