@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./config/dev-server",
     "build": "node ./config/webpack.prd.js",
-    "release": "node ./config/release.js"
+    "release": "node ./config/release.js",
+    "deploy": "npm run gh-pages",
+    "gh-pages": "./node_modules/.bin/gh-pages -d dist -b gh-pages"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
     "eslint-plugin-standard": "^2.0.1",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.14.0",
+    "gh-pages": "^0.11.0",
     "html-webpack-plugin": "^2.24.0",
     "webpack": "^1.13.2",
     "webpack-dev-middleware": "^1.8.4",
