@@ -2,13 +2,12 @@
   "name": "trello-drag",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "release/dragable.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "./node_modules/.bin/browser-sync start --server --files \"*\" ",
-    "dev": "./node_modules/.bin/webpack --watch",
-    "start": "./node_modules/.bin/browser-sync start --server --files \"*\" | ./node_modules/.bin/webpack --watch",
-    "build": "./node_modules/.bin/webpack -p"
+    "start": "node ./config/dev-server",
+    "build": "node ./config/webpack.prd.js",
+    "release": "node ./config/release.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +24,13 @@
     "eslint-config-standard": "^6.2.0",
     "eslint-plugin-promise": "^3.3.0",
     "eslint-plugin-standard": "^2.0.1",
-    "webpack": "^1.13.2"
+    "eventsource-polyfill": "^0.9.6",
+    "express": "^4.14.0",
+    "html-webpack-plugin": "^2.24.0",
+    "webpack": "^1.13.2",
+    "webpack-dev-middleware": "^1.8.4",
+    "webpack-dev-server": "^1.16.2",
+    "webpack-hot-middleware": "^2.13.0",
+    "webpack-merge": "^0.15.0"
   }
 }
