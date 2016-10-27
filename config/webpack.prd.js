@@ -4,6 +4,9 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 var baseConfig = require('./webpack.base')
 
 var webpackConfig = merge(baseConfig, {
+  output: {
+    publicPath: './'
+  },
   devtool: '#source-map',
   plugins: [
     new webpack.DefinePlugin({

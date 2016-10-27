@@ -8,7 +8,7 @@ module.exports = {
     // library: 'dragable',
     // libraryTarget: 'umd',
     filename: '[name].js',
-    publicPath: './',
+    publicPath: '/',
     path: path.resolve(__dirname, '../dist/')
   },
   module: {
