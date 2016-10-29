@@ -80,7 +80,6 @@ function Autoscroll () {
   this.reqA = null
   this.run = function (scrollTop, offsetWidth, direction) {
     var self = this
-    console.log('i am in')
     return function handle (timestamp) {
       var offsetX = document.documentElement.scrollLeft || document.body.scrollLeft
       if (direction > 0 && offsetX + document.body.offsetWidth < offsetWidth) {
@@ -89,6 +88,8 @@ function Autoscroll () {
       } else if (direction < 0 && offsetX > 0) {
         window.scrollTo(offsetX - 5, scrollTop)
         self.reqA = window.requestAnimationFrame(handle)
+      } else {
+        self.reqA = null
       }
     }
   }
@@ -104,8 +105,10 @@ Autoscroll.prototype.right = function (scrollTo, offsetWidth, cb) {
   }
 }
 Autoscroll.prototype.stop = function () {
-  window.cancelAnimationFrame(this.reqA)
-  this.reqA = null
+  if (this.reqA) {
+    window.cancelAnimationFrame(this.reqA)
+    this.reqA = null
+  }
 }
 
 var co = document.getElementsByClassName('co')[0]
@@ -129,6 +132,9 @@ dragable($('.co'), function (target, position, point) {
   } else {
     s.stop()
   }
+})
+on(document, 'mouseup', function () {
+  s.stop()
 })
 
 // add new one
