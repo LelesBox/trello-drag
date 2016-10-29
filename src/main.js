@@ -24,7 +24,7 @@
     }
   }
 }())
-import dragable from './dragable.v2'
+import dragable from './dragable'
 import { on } from './domApi'
 
 function $ (sel) {

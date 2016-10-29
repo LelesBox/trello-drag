@@ -1,16 +1,39 @@
 import { on, addClass, removeClass } from './domApi'
+// 生成drag-mask样式
+var style = document.createElement('style')
+style.innerHTML = `.drag-mask::after {
+  content: "";
+  position: absolute;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  background-color: #c0c6ca;
+  user-select: none;
+  -webkit-user-select:none;
+  -moz-user-select: none;
+  z-index: 9999;
+  border-radius: 4px;
+}
+[drag] {
+  position: relative;
+  cursor: pointer;
+  box-sizing: border-box;
+}`
+document.getElementsByTagName('head')[0].appendChild(style)
 
 function copyElm (elm) {
   var el = elm.cloneNode(true)
-  el.style.position = 'absolute'
-  var offsetX = document.documentElement.scrollLeft || document.body.scrollLeft
-  var offsetY = document.documentElement.scrollTop || document.body.scrollTop
+  el.style.position = 'fixed'
+  // var offsetX = document.documentElement.scrollLeft || document.body.scrollLeft
+  // var offsetY = document.documentElement.scrollTop || document.body.scrollTop
   var position = elm.getBoundingClientRect()
   el.style.margin = '0px'
-  el.style.top = position.top + offsetY + 'px'
-  el.style.left = position.left + offsetX + 'px'
+  el.style.top = position.top + 'px'
+  el.style.left = position.left + 'px'
   el.style.zIndex = 9999
   el.style.width = elm.clientWidth + 'px'
+  el.setAttribute('draggable', false)
   return el
 }
 
@@ -47,7 +70,7 @@ function getOVerlayElm (source, target, threshold) {
 }
 
 /* **********core*********** */
-function applyDrag (container) {
+function applyDrag (container, cb) {
   var containers = []
   var elms = []
   if (container.length !== undefined) {
@@ -74,6 +97,7 @@ function applyDrag (container) {
   return function (elm, sourceElm, point) {
     elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
     var a = elm.getBoundingClientRect()
+    cb && cb(elm, a, point)
     var el
     var i = length
     var j = clength
@@ -156,48 +180,32 @@ on(document, 'mousedown', function (e) {
     })
   }
 })
-
 on(document, 'mousemove', function (e) {
   if (target !== null) {
     point.moveX = e.clientX
     point.moveY = e.clientY
     _updateView(target, source, point)
+    e.preventDefault()
   }
 })
 
 on(document, 'mouseup', function () {
   if (target) {
-    document.body.removeChild(target)
+    document.body.contains(target) && document.body.removeChild(target)
     removeClass(source, 'drag-mask')
     target = null
   }
 })
 
-// 生成drag-mask样式
-var style = document.createElement('style')
-style.innerHTML = `.drag-mask::after {
-  content: "";
-  position: absolute;
-  top:0;
-  left:0;
-  width: 100%;
-  height: 100%;
-  background-color: #c0c6ca;
-  user-select: none;
-  -webkit-user-select:none;
-  -moz-user-select: none;
-  z-index: 9999;
-  border-radius: 4px;
-}
-[drag] {
-  position: relative;
-  cursor: pointer;
-  box-sizing: border-box;
-}`
+on(document, 'mouseleave', function () {
+  if (target) {
+    document.body.contains(target) && document.body.removeChild(target)
+    removeClass(source, 'drag-mask')
+    target = null
+  }
+})
 
-document.getElementsByTagName('head')[0].appendChild(style)
-
-module.exports = function (elms) {
+module.exports = function (elms, cb) {
   var index = idx++
   if (elms.length === undefined) {
     elms.setAttribute('drag-id', index)
@@ -206,10 +214,10 @@ module.exports = function (elms) {
       elms[i].setAttribute('drag-id', index)
     }
   }
-  updateViews[index] = applyDrag(elms)
+  updateViews[index] = applyDrag(elms, cb)
   return {
     update: function () {
-      updateViews[index] = applyDrag(elms)
+      updateViews[index] = applyDrag(elms, cb)
     }
   }
 }
