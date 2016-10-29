@@ -3,14 +3,18 @@
       }
       body {
         background-color: #0079bf;
-        height: 100%;
+        /*height: 100%;*/
+        /*width: 100%;*/
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
       .co {
         height: 100%;
+        /*overflow-x: scroll;*/
         white-space:nowrap;
+        /*设置这个了以后就可以让window.scrollTo()起效果，我也不造为什么唉，谁能告诉我😌*/
+        display: inline-block;
         user-select: none;
         -webkit-user-select:none;
         -moz-user-select: none;
