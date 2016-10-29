@@ -64,13 +64,25 @@ var bindEvent = (function () {
   if (document.addEventListener) {
     return function (element, event, handler) {
       if (element && event && handler) {
-        element.addEventListener(event, handler, false)
+        if (element.length !== undefined) {
+          for (var i = 0, l = element.length; i < l; i++) {
+            element[i].addEventListener(event, handler, false)
+          }
+        } else {
+          element.addEventListener(event, handler, false)
+        }
       }
     }
   } else {
     return function (element, event, handler) {
       if (element && event && handler) {
-        element.attachEvent('on' + event, handler)
+        if (element.length !== undefined) {
+          for (var i = 0, l = element.length; i < l; i++) {
+            element[i].attachEvent('on' + event, handler)
+          }
+        } else {
+          element.attachEvent('on' + event, handler)
+        }
       }
     }
   }

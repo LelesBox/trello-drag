@@ -1,4 +1,30 @@
-import dragable from './dragable'
+(function () {
+  var lastTime = 0
+  var vendors = ['webkit', 'moz']
+  for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame']
+    window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||    // Webkit中此取消方法的名字变了
+                                      window[vendors[x] + 'CancelRequestAnimationFrame']
+  }
+
+  if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = function (callback, element) {
+      var currTime = new Date().getTime()
+      var timeToCall = Math.max(0, 16.7 - (currTime - lastTime))
+      var id = window.setTimeout(function () {
+        callback(currTime + timeToCall)
+      }, timeToCall)
+      lastTime = currTime + timeToCall
+      return id
+    }
+  }
+  if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = function (id) {
+      clearTimeout(id)
+    }
+  }
+}())
+import dragable from './dragable.v2'
 import { on } from './domApi'
 
 function $ (sel) {
@@ -24,16 +50,7 @@ function getChildren (number) {
   }
   return fragement
 }
-var d = dragable($('.blocks'))
-dragable($('.co'))
-document.addEventListener('click', function (e) {
-  if (e.target.className === 'addone') {
-    var blocks = e.target.parentNode.children[0]
-    blocks.appendChild(getChildren(1))
-    d.update()
-  }
-})
-
+// container dragable
 var point = {
   startX: 0,
   startY: 0,
@@ -41,7 +58,6 @@ var point = {
 }
 var scroll = false
 on($('.co')[0], 'mousedown', function (e) {
-  console.log('mousedown', e.target)
   if (!scroll && e.button === 0 && e.target === this) {
     point.startX = e.clientX
     point.startY = e.clientY
@@ -52,17 +68,74 @@ on($('.co')[0], 'mousedown', function (e) {
 })
 on($('.co')[0], 'mousemove', function (e) {
   if (scroll) {
-    console.log('mousemove', e.target)
     var offsetX = point.startX - e.clientX
-    console.log(offsetX)
     window.scrollTo(point.offsetLeft + offsetX, document.documentElement.scrollTop || document.body.scrollTop)
   }
 })
 on($('.co')[0], 'mouseup', function (e) {
-  console.log('mouseup', e.target)
   scroll = false
 })
-on($('.co')[0], 'mouseleave', function (e) {
-  console.log('mouseleave', e.target)
-  scroll = false
+
+function Autoscroll () {
+  this.reqA = null
+  this.run = function (scrollTop, offsetWidth, direction) {
+    var self = this
+    console.log('i am in')
+    return function handle (timestamp) {
+      var offsetX = document.documentElement.scrollLeft || document.body.scrollLeft
+      if (direction > 0 && offsetX + document.body.offsetWidth < offsetWidth) {
+        window.scrollTo(offsetX + 5, scrollTop)
+        self.reqA = window.requestAnimationFrame(handle)
+      } else if (direction < 0 && offsetX > 0) {
+        window.scrollTo(offsetX - 5, scrollTop)
+        self.reqA = window.requestAnimationFrame(handle)
+      }
+    }
+  }
+}
+Autoscroll.prototype.left = function (scrollTo, offsetWidth, cb) {
+  if (!this.reqA) {
+    this.reqA = window.requestAnimationFrame(this.run(scrollTo, offsetWidth, -1, cb))
+  }
+}
+Autoscroll.prototype.right = function (scrollTo, offsetWidth, cb) {
+  if (!this.reqA) {
+    this.reqA = window.requestAnimationFrame(this.run(scrollTo, offsetWidth, 1, cb))
+  }
+}
+Autoscroll.prototype.stop = function () {
+  window.cancelAnimationFrame(this.reqA)
+  this.reqA = null
+}
+
+var co = document.getElementsByClassName('co')[0]
+var scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+var s = new Autoscroll()
+var offsetWidth = co.offsetWidth
+var d = dragable($('.blocks'), function (target, position, point) {
+  if (position.right > document.body.clientWidth) {
+    s.right(scrollTop, offsetWidth)
+  } else if (position.left < 0) {
+    s.left(scrollTop, offsetWidth)
+  } else {
+    s.stop()
+  }
+})
+dragable($('.co'), function (target, position, point) {
+  if (position.right > document.body.clientWidth) {
+    s.right(scrollTop, offsetWidth)
+  } else if (position.left < 0) {
+    s.left(scrollTop, offsetWidth)
+  } else {
+    s.stop()
+  }
+})
+
+// add new one
+document.addEventListener('click', function (e) {
+  if (e.target.className === 'addone') {
+    var blocks = e.target.parentNode.children[0]
+    blocks.appendChild(getChildren(1))
+    d.update()
+  }
 })
