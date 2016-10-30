@@ -75,18 +75,22 @@ on($('.co')[0], 'mousemove', function (e) {
 on($('.co')[0], 'mouseup', function (e) {
   scroll = false
 })
+on($('.co')[0], 'mouseleave', function (e) {
+  scroll = false
+})
 
 function Autoscroll () {
   this.reqA = null
+  this.increase = 5
   this.run = function (scrollTop, offsetWidth, direction) {
     var self = this
     return function handle (timestamp) {
       var offsetX = document.documentElement.scrollLeft || document.body.scrollLeft
       if (direction > 0 && offsetX + document.body.offsetWidth < offsetWidth) {
-        window.scrollTo(offsetX + 5, scrollTop)
+        window.scrollTo(offsetX + self.increase, scrollTop)
         self.reqA = window.requestAnimationFrame(handle)
       } else if (direction < 0 && offsetX > 0) {
-        window.scrollTo(offsetX - 5, scrollTop)
+        window.scrollTo(offsetX - self.increase, scrollTop)
         self.reqA = window.requestAnimationFrame(handle)
       } else {
         self.reqA = null
@@ -94,19 +98,22 @@ function Autoscroll () {
     }
   }
 }
-Autoscroll.prototype.left = function (scrollTo, offsetWidth, cb) {
+Autoscroll.prototype.left = function (scrollTo, offsetWidth, increase) {
+  if (increase) this.increase = increase
   if (!this.reqA) {
-    this.reqA = window.requestAnimationFrame(this.run(scrollTo, offsetWidth, -1, cb))
+    this.reqA = window.requestAnimationFrame(this.run(scrollTo, offsetWidth, -1))
   }
 }
-Autoscroll.prototype.right = function (scrollTo, offsetWidth, cb) {
+Autoscroll.prototype.right = function (scrollTo, offsetWidth, increase) {
+  if (increase) this.increase = increase
   if (!this.reqA) {
-    this.reqA = window.requestAnimationFrame(this.run(scrollTo, offsetWidth, 1, cb))
+    this.reqA = window.requestAnimationFrame(this.run(scrollTo, offsetWidth, 1))
   }
 }
 Autoscroll.prototype.stop = function () {
   if (this.reqA) {
     window.cancelAnimationFrame(this.reqA)
+    this.increase = 5
     this.reqA = null
   }
 }
@@ -116,10 +123,22 @@ var scrollTop = document.documentElement.scrollTop || document.body.scrollTop
 var s = new Autoscroll()
 var offsetWidth = co.offsetWidth
 var d = dragable($('.blocks'), function (target, position, point) {
-  if (position.right > document.body.clientWidth) {
-    s.right(scrollTop, offsetWidth)
+  var offset = position.right - document.body.clientWidth
+  var increase = 5
+  if (offset > 0) {
+    if (offset > 60) {
+      increase = 20
+    } else if (offset > 30) {
+      increase = 10
+    }
+    s.right(scrollTop, offsetWidth, increase)
   } else if (position.left < 0) {
-    s.left(scrollTop, offsetWidth)
+    if (position.left < -60) {
+      increase = 20
+    } else if (position.left < -30) {
+      increase = 10
+    }
+    s.left(scrollTop, offsetWidth, increase)
   } else {
     s.stop()
   }
@@ -136,6 +155,8 @@ dragable($('.co'), function (target, position, point) {
 on(document, 'mouseup', function () {
   s.stop()
 })
+
+// 增加往下拖动时的检测
 
 // add new one
 document.addEventListener('click', function (e) {
