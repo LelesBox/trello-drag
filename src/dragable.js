@@ -93,6 +93,11 @@ function applyDrag (container, cb) {
   var length = elms.length
   var clength = containers.length
   return function (elm, sourceElm, point) {
+    console.log('////////////////////////////////////////')
+    elms.forEach((item) => {
+      console.log(item.getAttribute('key'))
+    })
+    console.log('////////////////////////////////////////')
     elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
     var a = elm.getBoundingClientRect()
     cb && cb(elm, a, point)

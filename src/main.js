@@ -26,13 +26,13 @@
 }())
 import dragable from './dragable'
 import { on } from './domApi'
+var kk = 0
 
 function $ (sel) {
   return document.querySelectorAll(sel)
 }
-var i = 7
 var j = 0
-while (i--) {
+for (var i = 0, k = 2; i < k; i++) {
   var l = ++j + 1
   $('.blocks')[i].appendChild(getChildren(l))
 }
@@ -45,6 +45,8 @@ function getChildren (number) {
     var el = document.createElement('div')
     el.className = 'drag'
     el.setAttribute('drag', '')
+    el.innerHTML = kk
+    el.setAttribute('key', kk++)
     el.style.backgroundColor = randomColor()
     fragement.appendChild(el)
   }
