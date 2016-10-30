@@ -25,8 +25,6 @@ document.getElementsByTagName('head')[0].appendChild(style)
 function copyElm (elm) {
   var el = elm.cloneNode(true)
   el.style.position = 'fixed'
-  // var offsetX = document.documentElement.scrollLeft || document.body.scrollLeft
-  // var offsetY = document.documentElement.scrollTop || document.body.scrollTop
   var position = elm.getBoundingClientRect()
   el.style.margin = '0px'
   el.style.top = position.top + 'px'
@@ -118,12 +116,8 @@ function applyDrag (container, cb) {
         continue
       }
         // 覆盖面积达到百分之七十的元素
-        // 1.如果该元素于sourceElm属于一个父容器，则
-        // 1.1 如果sourceElm粗线在el之前，则 insertBefore(sourceElm, el.nextSibling)
-        // 1.2 如果sourceElm粗线在el之后，则 insertBefore(sourceElm, el)
+        // 1.如果该元素于sourceElm属于一个父容器
         // 2. 如果el与sourceElm不属于同一个父容器
-        // 2.1 如果a.top > b.top 则 insertBefore(sourceElm, el.nextSibling)
-        // 2.2 如果 a.bottom < b.bottom 则 insertBefore(sourceElm, el)
       if (el.parentNode === sourceElm.parentNode) {
         if (getOVerlayElm(elm, el, 0.7)) {
           if (targetIdx < i) {
