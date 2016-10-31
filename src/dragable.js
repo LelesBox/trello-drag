@@ -93,14 +93,10 @@ function applyDrag (container, cb) {
   var length = elms.length
   var clength = containers.length
   return function (elm, sourceElm, point) {
-    console.log('////////////////////////////////////////')
-    elms.forEach((item) => {
-      console.log(item.getAttribute('key'))
-    })
-    console.log('////////////////////////////////////////')
     elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
     var a = elm.getBoundingClientRect()
     cb && cb(elm, a, point)
+    onmove && onmove(elm, a, point)
     var el
     var i = length
     var j = clength
@@ -125,6 +121,11 @@ function applyDrag (container, cb) {
         // 2. 如果el与sourceElm不属于同一个父容器
       if (el.parentNode === sourceElm.parentNode) {
         if (getOVerlayElm(elm, el, 0.7)) {
+          // 当跨容器拖动的时候你可能会纳闷elms顺序都变了，就会出现上下元素但是elms位置完全相反的情况
+          // 但是仔细想想，如果对调了，一个元素从下往上拖，但是它的targetIdx < i。
+          // 那么执行el.parentNode.insertBefore(sourceElm, el.nextSibling)的时候，el.nextSibling相当于sourceElm。所以insert步骤什么都没做
+          // 接着调换targetIdx和i，这样他们的顺序就正常了，接在在下一次循环的时候就能正常触发 targetIdx > i的情况
+          // 不得不说，js的循环真的很快，每次拖动都去遍历近100个元素都不见卡顿
           if (targetIdx < i) {
             el.parentNode.insertBefore(sourceElm, el.nextSibling)
             exchange(elms, targetIdx, i)
@@ -156,6 +157,8 @@ var _updateView = null
 var target = null
 // 选中的拖动元素
 var source = null
+// 在色块移动的时候会触发
+var onmove = null
 var point = {
   startX: 0,
   startY: 0,
@@ -204,7 +207,7 @@ on(document, 'mouseleave', function () {
   }
 })
 
-module.exports = function (elms, cb) {
+function dragable (elms, cb) {
   var index = idx++
   if (elms.length === undefined) {
     elms.setAttribute('drag-id', index)
@@ -220,3 +223,7 @@ module.exports = function (elms, cb) {
     }
   }
 }
+dragable.onmove = function (cb) {
+  onmove = cb
+}
+module.exports = dragable

@@ -26,13 +26,12 @@
 }())
 import dragable from './dragable'
 import { on } from './domApi'
-var kk = 0
 
 function $ (sel) {
   return document.querySelectorAll(sel)
 }
 var j = 0
-for (var i = 0, k = 2; i < k; i++) {
+for (var i = 0, k = 20; i < k; i++) {
   var l = ++j + 1
   $('.blocks')[i].appendChild(getChildren(l))
 }
@@ -45,8 +44,6 @@ function getChildren (number) {
     var el = document.createElement('div')
     el.className = 'drag'
     el.setAttribute('drag', '')
-    el.innerHTML = kk
-    el.setAttribute('key', kk++)
     el.style.backgroundColor = randomColor()
     fragement.appendChild(el)
   }
@@ -124,7 +121,10 @@ var co = document.getElementsByClassName('co')[0]
 var scrollTop = document.documentElement.scrollTop || document.body.scrollTop
 var s = new Autoscroll()
 var offsetWidth = co.offsetWidth
-var d = dragable($('.blocks'), function (target, position, point) {
+var d = dragable($('.blocks'))
+dragable($('.co'))
+
+dragable.onmove(function (target, position, point) {
   var offset = position.right - document.body.clientWidth
   var increase = 5
   if (offset > 0) {
@@ -145,19 +145,9 @@ var d = dragable($('.blocks'), function (target, position, point) {
     s.stop()
   }
 })
-dragable($('.co'), function (target, position, point) {
-  if (position.right > document.body.clientWidth) {
-    s.right(scrollTop, offsetWidth)
-  } else if (position.left < 0) {
-    s.left(scrollTop, offsetWidth)
-  } else {
-    s.stop()
-  }
-})
 on(document, 'mouseup', function () {
   s.stop()
 })
-
 // 增加往下拖动时的检测
 
 // add new one
