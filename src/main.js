@@ -31,7 +31,7 @@ function $ (sel) {
   return document.querySelectorAll(sel)
 }
 var j = 0
-for (var i = 0, k = 20; i < k; i++) {
+for (var i = 0, k = 10; i < k; i++) {
   var l = ++j + 1
   $('.blocks')[i].appendChild(getChildren(l))
 }
