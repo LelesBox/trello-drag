@@ -18,56 +18,92 @@ style.innerHTML = `.drag-mask::after {
 [drag] {
   position: relative;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select:none;
+  -moz-user-select: none;
   box-sizing: border-box;
 }`
+// 插入dom中。
 document.getElementsByTagName('head')[0].appendChild(style)
-
-function copyElm (elm) {
-  var el = elm.cloneNode(true)
-  el.style.position = 'fixed'
-  var position = elm.getBoundingClientRect()
-  el.style.margin = '0px'
-  el.style.top = position.top + 'px'
-  el.style.left = position.left + 'px'
-  el.style.zIndex = 9999
-  el.style.width = elm.clientWidth + 'px'
-  el.setAttribute('draggable', false)
-  return el
+// 给每个容器打标签
+var idx = 0
+// 存放各个容器下的updateView方法
+var updateViews = {}
+// 当前使用的view更新方法。
+var _updateView = null
+// 拖动的元素，拖动的时候其实它是source创建出来的副本
+var target = null
+// 选中的拖动元素
+var source = null
+// 在元素块拖动的时候会触发，可用于检测是否触碰到浏览器边缘可以自定义滚动
+var onmove = null
+// 移动的记录节点
+var point = {
+  startX: 0,
+  startY: 0,
+  moveX: 0,
+  moveY: 0
 }
+// 监听全局鼠标按下事件
+// 如果该元素包含drag属性，则启用drag方法
+on(document, 'mousedown', startMove)
+on(document, 'mousemove', onMove)
+on(document, 'mouseup', stopMove)
+on(document, 'mouseleave', stopMove)
 
-function exchange (arr, idx, idx2) {
-  var temp = arr[idx]
-  arr[idx] = arr[idx2]
-  arr[idx2] = temp
-}
-
-function findIndex (arr, target) {
-  var i = arr.length
-  while (i--) {
-    if (arr[i] === target) {
-      return i
+export default function dragable (elms, cb) {
+  var index = idx++
+  if (elms.length === undefined) {
+    elms.setAttribute('drag-id', index)
+  } else {
+    for (var i = 0, l = elms.length; i < l; i++) {
+      elms[i].setAttribute('drag-id', index)
     }
   }
-  return -1
-}
-// 成功则返回target 能不能用VDOM保存起来这些数据
-function getOVerlayElm (source, target, threshold) {
-  var p1 = source.getBoundingClientRect()
-  var p2 = target.getBoundingClientRect()
-  var overlayWidth = (Math.min(p1.bottom, p2.bottom) - Math.max(p1.top, p2.top))
-  var overlayHeight = (Math.min(p1.right, p2.right) - Math.max(p1.left, p2.left))
-  if (overlayWidth > 0 && overlayHeight > 0) {
-    var overlay = overlayWidth * overlayHeight
-    var minarea = Math.min(p1.width * p1.height, p2.width * p2.height)
-    if (overlay / minarea > threshold) {
-      // 表示target元素被souce覆盖了！
-      return target
+  updateViews[index] = applyDrag(elms, cb)
+  return {
+    update: function () {
+      updateViews[index] = applyDrag(elms, cb)
     }
   }
-  return null
+}
+dragable.onmove = function (cb) {
+  onmove = cb
 }
 
-/* **********core*********** */
+module.exports = dragable
+// 开始移动
+function startMove (e) {
+  if (e.button === 0 && e.target.getAttribute('drag') !== null) {
+    point.startX = e.clientX
+    point.startY = e.clientY
+    var dragId = e.target.parentNode.getAttribute('drag-id')
+    if (dragId === undefined) return
+    _updateView = updateViews[dragId]
+    setTimeout(function () {
+      source = e.target
+      target = copyElmement(source)
+      addClass(source, 'drag-mask')
+      document.body.appendChild(target)
+    })
+  }
+}
+function onMove (e) {
+  if (target !== null) {
+    point.moveX = e.clientX
+    point.moveY = e.clientY
+    _updateView(target, source, point)
+    onmove && onmove(target, point)
+  }
+}
+function stopMove (e) {
+  if (target) {
+    document.body.contains(target) && document.body.removeChild(target)
+    removeClass(source, 'drag-mask')
+    target = null
+  }
+}
+
 function applyDrag (container, cb) {
   var containers = []
   var elms = []
@@ -96,7 +132,6 @@ function applyDrag (container, cb) {
     elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
     var a = elm.getBoundingClientRect()
     cb && cb(elm, a, point)
-    onmove && onmove(elm, a, point)
     var el
     var i = length
     var j = clength
@@ -147,83 +182,46 @@ function applyDrag (container, cb) {
     }
   }
 }
-
-// 给每个容器打标签
-var idx = 0
-// 存放各个容器下的updateView方法
-var updateViews = {}
-var _updateView = null
-// 拖动的元素，拖动的时候其实它是source创建出来的副本
-var target = null
-// 选中的拖动元素
-var source = null
-// 在色块移动的时候会触发
-var onmove = null
-var point = {
-  startX: 0,
-  startY: 0,
-  moveX: 0,
-  moveY: 0
+function copyElmement (elm) {
+  var el = elm.cloneNode(true)
+  el.style.position = 'fixed'
+  var position = elm.getBoundingClientRect()
+  el.style.margin = '0px'
+  el.style.top = position.top + 'px'
+  el.style.left = position.left + 'px'
+  el.style.zIndex = 9999
+  el.style.width = elm.clientWidth + 'px'
+  return el
 }
-// 监听全局鼠标按下事件
-// 如果该元素包含drag属性，则启用drag方法
-on(document, 'mousedown', function (e) {
-  if (e.button === 0 && e.target.getAttribute('drag') !== null) {
-    point.startX = e.clientX
-    point.startY = e.clientY
-    var dragId = e.target.parentNode.getAttribute('drag-id')
-    if (dragId === undefined) return
-    _updateView = updateViews[dragId]
-    setTimeout(function () {
-      source = e.target
-      target = copyElm(source)
-      addClass(source, 'drag-mask')
-      document.body.appendChild(target)
-    })
-  }
-})
-on(document, 'mousemove', function (e) {
-  if (target !== null) {
-    point.moveX = e.clientX
-    point.moveY = e.clientY
-    _updateView(target, source, point)
-    e.preventDefault()
-  }
-})
 
-on(document, 'mouseup', function () {
-  if (target) {
-    document.body.contains(target) && document.body.removeChild(target)
-    removeClass(source, 'drag-mask')
-    target = null
-  }
-})
+function exchange (arr, idx, idx2) {
+  var temp = arr[idx]
+  arr[idx] = arr[idx2]
+  arr[idx2] = temp
+}
 
-on(document, 'mouseleave', function () {
-  if (target) {
-    document.body.contains(target) && document.body.removeChild(target)
-    removeClass(source, 'drag-mask')
-    target = null
-  }
-})
-
-function dragable (elms, cb) {
-  var index = idx++
-  if (elms.length === undefined) {
-    elms.setAttribute('drag-id', index)
-  } else {
-    for (var i = 0, l = elms.length; i < l; i++) {
-      elms[i].setAttribute('drag-id', index)
+function findIndex (arr, target) {
+  var i = arr.length
+  while (i--) {
+    if (arr[i] === target) {
+      return i
     }
   }
-  updateViews[index] = applyDrag(elms, cb)
-  return {
-    update: function () {
-      updateViews[index] = applyDrag(elms, cb)
+  return -1
+}
+// 成功则返回target 能不能用VDOM保存起来这些数据
+function getOVerlayElm (source, target, threshold) {
+  var p1 = source.getBoundingClientRect()
+  var p2 = target.getBoundingClientRect()
+  var overlayWidth = (Math.min(p1.bottom, p2.bottom) - Math.max(p1.top, p2.top))
+  var overlayHeight = (Math.min(p1.right, p2.right) - Math.max(p1.left, p2.left))
+  if (overlayWidth > 0 && overlayHeight > 0) {
+    var overlay = overlayWidth * overlayHeight
+    var minarea = Math.min(p1.width * p1.height, p2.width * p2.height)
+    if (overlay / minarea > threshold) {
+      // 表示target元素被souce覆盖了！
+      return target
     }
   }
+  return null
 }
-dragable.onmove = function (cb) {
-  onmove = cb
-}
-module.exports = dragable

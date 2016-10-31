@@ -124,7 +124,8 @@ var offsetWidth = co.offsetWidth
 var d = dragable($('.blocks'))
 dragable($('.co'))
 
-dragable.onmove(function (target, position, point) {
+dragable.onmove(function (target, point) {
+  var position = target.getBoundingClientRect()
   var offset = position.right - document.body.clientWidth
   var increase = 5
   if (offset > 0) {
@@ -148,7 +149,6 @@ dragable.onmove(function (target, position, point) {
 on(document, 'mouseup', function () {
   s.stop()
 })
-// 增加往下拖动时的检测
 
 // add new one
 document.addEventListener('click', function (e) {
