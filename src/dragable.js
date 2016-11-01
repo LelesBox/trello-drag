@@ -51,7 +51,7 @@ on(document, 'mousemove', onMove)
 on(document, 'mouseup', stopMove)
 on(document, 'mouseleave', stopMove)
 
-export default function dragable (elms, cb) {
+export default function dragable (elms, sel) {
   var index = idx++
   if (elms.length === undefined) {
     elms.setAttribute('drag-id', index)
@@ -60,10 +60,10 @@ export default function dragable (elms, cb) {
       elms[i].setAttribute('drag-id', index)
     }
   }
-  updateViews[index] = applyDrag(elms, cb)
+  updateViews[index] = applyDrag(elms)
   return {
     update: function () {
-      updateViews[index] = applyDrag(elms, cb)
+      updateViews[index] = applyDrag(elms)
     }
   }
 }
@@ -73,21 +73,32 @@ dragable.onmove = function (cb) {
 
 module.exports = dragable
 // 开始移动
+// 有时候触发的e.target并不是我们想要的元素，可能我们想要的元素都被子元素给铺满了，这时候无论怎么点
+// e.target永远不会是我们想要的元素，这时候，我们可以知道元素里面的某一个元素去监听
 function startMove (e) {
-  if (e.button === 0 && e.target.getAttribute('drag') !== null) {
+  if (e.button === 0 && e.target.getAttribute('drag') !== null || e.button === 0 && e.target.getAttribute('drag-el') !== null) {
+    var dragId, s
+    if (e.target.getAttribute('drag') !== null) {
+      dragId = e.target.parentNode.getAttribute('drag-id')
+      if (dragId === undefined) return
+      s = e.target
+    } else if (e.target.getAttribute('drag-el') !== null) {
+      dragId = e.target.parentNode.parentNode.getAttribute('drag-id')
+      if (dragId === undefined) return
+      s = e.target.parentNode
+    }
     point.startX = e.clientX
     point.startY = e.clientY
-    var dragId = e.target.parentNode.getAttribute('drag-id')
-    if (dragId === undefined) return
     _updateView = updateViews[dragId] || function () {}
     setTimeout(function () {
-      source = e.target
+      source = s
       target = copyElmement(source)
       addClass(source, 'drag-mask')
       document.body.appendChild(target)
     })
   }
 }
+
 function onMove (e) {
   if (target !== null) {
     point.moveX = e.clientX
@@ -104,7 +115,7 @@ function stopMove (e) {
   }
 }
 
-function applyDrag (container, cb) {
+function applyDrag (container) {
   var containers = []
   var elms = []
   if (container.length !== undefined) {
@@ -131,7 +142,6 @@ function applyDrag (container, cb) {
   return function (elm, sourceElm, point) {
     elm.style.transform = `translate3d(${point.moveX - point.startX}px, ${point.moveY - point.startY}px, 0) rotate(5deg)`
     var a = elm.getBoundingClientRect()
-    cb && cb(elm, a, point)
     var el
     var i = length
     var j = clength

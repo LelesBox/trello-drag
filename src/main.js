@@ -122,7 +122,7 @@ var scrollTop = document.documentElement.scrollTop || document.body.scrollTop
 var s = new Autoscroll()
 var offsetWidth = co.offsetWidth
 var d = dragable($('.blocks'))
-dragable($('.co'))
+dragable($('.co'), '.sel')
 
 dragable.onmove(function (target, point) {
   var position = target.getBoundingClientRect()
