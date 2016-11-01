@@ -122,7 +122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    point.startY = e.clientY;
 	    var dragId = e.target.parentNode.getAttribute('drag-id');
 	    if (dragId === undefined) return;
-	    _updateView = updateViews[dragId];
+	    _updateView = updateViews[dragId] || function () {};
 	    setTimeout(function () {
 	      source = e.target;
 	      target = copyElmement(source);
@@ -165,7 +165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    children = container.children;
 	    for (var k = 0, klength = children.length; k < klength; k++) {
 	      if (children[k].getAttribute('drag') !== null) {
-	        elms.push(children[j]);
+	        elms.push(children[k]);
 	      }
 	    }
 	  }
