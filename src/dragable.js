@@ -170,7 +170,7 @@ function applyDrag (container, cb) {
           }
           return
         }
-      } else if (getOVerlayElm(elm, el, 0.3)) {
+      } else if (getOVerlayElm(elm, el, 0.5)) {
         b = el.getBoundingClientRect()
         if (a.top > b.top) {
           el.parentNode.insertBefore(sourceElm, el.nextSibling)
