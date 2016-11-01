@@ -15,6 +15,20 @@ var webpackConfig = merge(baseConfig, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': 'production'
+    })
+  ]
+})
+
+var minifyConfig = merge(webpackConfig, {
+  entry: {
+    dragable: './src/dragable.js'
+  },
+  output: {
+    filename: '[name].min.js'
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': 'production'
     }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
@@ -26,5 +40,8 @@ var webpackConfig = merge(baseConfig, {
 
 webpack(webpackConfig, function (err, stats) {
   if (err) return console.log(err)
-  console.log('build dragable.js!')
+  webpack(minifyConfig, function (err, stats) {
+    if (err) return console.log(err)
+    console.log('release dragable.js!')
+  })
 })
