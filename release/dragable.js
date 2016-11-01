@@ -94,7 +94,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	(0, _domApi.on)(document, 'mouseup', stopMove);
 	(0, _domApi.on)(document, 'mouseleave', stopMove);
 
-	function dragable(elms, cb) {
+	function dragable(elms, sel) {
 	  var index = idx++;
 	  if (elms.length === undefined) {
 	    elms.setAttribute('drag-id', index);
@@ -103,10 +103,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      elms[i].setAttribute('drag-id', index);
 	    }
 	  }
-	  updateViews[index] = applyDrag(elms, cb);
+	  updateViews[index] = applyDrag(elms);
 	  return {
 	    update: function update() {
-	      updateViews[index] = applyDrag(elms, cb);
+	      updateViews[index] = applyDrag(elms);
 	    }
 	  };
 	}
@@ -116,21 +116,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = dragable;
 	// 开始移动
+	// 有时候触发的e.target并不是我们想要的元素，可能我们想要的元素都被子元素给铺满了，这时候无论怎么点
+	// e.target永远不会是我们想要的元素，这时候，我们可以知道元素里面的某一个元素去监听
 	function startMove(e) {
-	  if (e.button === 0 && e.target.getAttribute('drag') !== null) {
+	  if (e.button === 0 && e.target.getAttribute('drag') !== null || e.button === 0 && e.target.getAttribute('drag-el') !== null) {
+	    var dragId, s;
+	    if (e.target.getAttribute('drag') !== null) {
+	      dragId = e.target.parentNode.getAttribute('drag-id');
+	      if (dragId === undefined) return;
+	      s = e.target;
+	    } else if (e.target.getAttribute('drag-el') !== null) {
+	      dragId = e.target.parentNode.parentNode.getAttribute('drag-id');
+	      if (dragId === undefined) return;
+	      s = e.target.parentNode;
+	    }
 	    point.startX = e.clientX;
 	    point.startY = e.clientY;
-	    var dragId = e.target.parentNode.getAttribute('drag-id');
-	    if (dragId === undefined) return;
 	    _updateView = updateViews[dragId] || function () {};
 	    setTimeout(function () {
-	      source = e.target;
+	      source = s;
 	      target = copyElmement(source);
 	      (0, _domApi.addClass)(source, 'drag-mask');
 	      document.body.appendChild(target);
 	    });
 	  }
 	}
+
 	function onMove(e) {
 	  if (target !== null) {
 	    point.moveX = e.clientX;
@@ -147,7 +158,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	function applyDrag(container, cb) {
+	function applyDrag(container) {
 	  var containers = [];
 	  var elms = [];
 	  if (container.length !== undefined) {
@@ -174,7 +185,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return function (elm, sourceElm, point) {
 	    elm.style.transform = 'translate3d(' + (point.moveX - point.startX) + 'px, ' + (point.moveY - point.startY) + 'px, 0) rotate(5deg)';
 	    var a = elm.getBoundingClientRect();
-	    cb && cb(elm, a, point);
 	    var el;
 	    var i = length;
 	    var j = clength;
@@ -213,7 +223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	          return;
 	        }
-	      } else if (getOVerlayElm(elm, el, 0.3)) {
+	      } else if (getOVerlayElm(elm, el, 0.5)) {
 	        b = el.getBoundingClientRect();
 	        if (a.top > b.top) {
 	          el.parentNode.insertBefore(sourceElm, el.nextSibling);
