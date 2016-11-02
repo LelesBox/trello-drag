@@ -51,8 +51,13 @@ on(document, 'mousemove', onMove)
 on(document, 'mouseup', stopMove)
 on(document, 'mouseleave', stopMove)
 
-export default function dragable (elms, sel) {
-  var index = idx++
+export default function dragable (elms, id) {
+  var index = 0
+  if (id !== undefined) {
+    index = id
+  } else {
+    index = idx++
+  }
   if (elms.length === undefined) {
     elms.setAttribute('drag-id', index)
   } else {
@@ -63,7 +68,7 @@ export default function dragable (elms, sel) {
   updateViews[index] = applyDrag(elms)
   return {
     update: function () {
-      updateViews[index] = applyDrag(elms)
+      dragable(elms, index)
     }
   }
 }
