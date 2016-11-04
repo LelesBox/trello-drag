@@ -94,8 +94,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	(0, _domApi.on)(document, 'mouseup', stopMove);
 	(0, _domApi.on)(document, 'mouseleave', stopMove);
 
-	function dragable(elms, sel) {
-	  var index = idx++;
+	function dragable(elms, id) {
+	  var index = 0;
+	  if (id !== undefined) {
+	    index = id;
+	  } else {
+	    index = idx++;
+	  }
 	  if (elms.length === undefined) {
 	    elms.setAttribute('drag-id', index);
 	  } else {
@@ -106,7 +111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  updateViews[index] = applyDrag(elms);
 	  return {
 	    update: function update() {
-	      updateViews[index] = applyDrag(elms);
+	      dragable(elms, index);
 	    }
 	  };
 	}
@@ -133,16 +138,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    point.startX = e.clientX;
 	    point.startY = e.clientY;
 	    _updateView = updateViews[dragId] || function () {};
+	    source = s;
+	  }
+	}
+
+	function onMove(e) {
+	  // 先移动3像素后才去覆盖source，不然就会把source隐藏起来无法触发绑定在source上的事件
+	  var Xoffset = Math.abs(e.clientX - point.startX);
+	  var Yoffset = Math.abs(e.clientY - point.startY);
+	  if (target === null && source !== null && (Xoffset > 3 || Yoffset > 3)) {
+	    point.startX = e.clientX;
+	    point.startY = e.clientY;
 	    setTimeout(function () {
-	      source = s;
 	      target = copyElmement(source);
 	      (0, _domApi.addClass)(source, 'drag-mask');
 	      document.body.appendChild(target);
 	    });
 	  }
-	}
-
-	function onMove(e) {
 	  if (target !== null) {
 	    point.moveX = e.clientX;
 	    point.moveY = e.clientY;
@@ -151,10 +163,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 	function stopMove(e) {
-	  if (target) {
+	  if (target || source) {
 	    document.body.contains(target) && document.body.removeChild(target);
 	    (0, _domApi.removeClass)(source, 'drag-mask');
 	    target = null;
+	    source = null;
 	  }
 	}
 
